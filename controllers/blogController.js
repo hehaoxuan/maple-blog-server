@@ -16,7 +16,7 @@ const {
   deleteByUid,
   updateOne,
   findPaging,
-} = require("../database/video.js");
+} = require("../database/blog.js");
 
 String.prototype.getUid = function () {
   return this.replace(/[^0-9]+/g, "");
@@ -34,7 +34,7 @@ const rename = (oldpath, newpath) => {
 };
 
 // 获取所有的博客表单 包含审核以及未审核的内容
-const video_all = async (req, res) => {
+const blog_all = async (req, res) => {
   //返回所有的video信息
   const sendRes = (data) => {
     res.send(data);
@@ -43,7 +43,7 @@ const video_all = async (req, res) => {
 };
 
 // 获取所有的博客表单 包含上架及未上架的内容
-const video_all_paging = async (req, res) => {
+const blog_all_paging = async (req, res) => {
   //返回所有的video信息
   const { current, pageSize } = req.query;
   const sendRes = (data) => {
@@ -52,21 +52,19 @@ const video_all_paging = async (req, res) => {
   findPaging(sendRes, current, pageSize);
 };
 
-// 获取所有的博客表单
-const video_all_auditing = async (req, res) => {
+// 获取所有已经审核的博客
+const blog_all_auditing = async (req, res) => {
   //返回所有的video信息
   let { auditing } = req.body;
-  auditing = auditing ? JSON.parse(auditing) : "";
 
   const sendRes = (data) => {
     res.send(data);
-    console.log(data);
   };
   findAllIsAuditing(auditing, sendRes); //使用回调函数的形式进行异步的数据发送
 };
 
-// 博客流服务
-const video_play = (req, res) => {
+// 博客 视频流服务
+const blog_video_play = (req, res) => {
   const { id: videoId } = req.params;
   // console.log(req)
   var file = path.resolve(__dirname, `../resources/video/${videoId}.mp4`);
@@ -110,7 +108,7 @@ const video_play = (req, res) => {
 };
 
 // 根据id来获取博客的详细信息
-const video_get_id = (req, res) => {
+const blog_get_id = (req, res) => {
   const sendRes = (data) => {
     res.send(data);
   };
@@ -119,7 +117,7 @@ const video_get_id = (req, res) => {
 };
 
 // 获取博客的封面
-const video_cover = (req, res) => {
+const blog_cover = (req, res) => {
   const { id } = req.params;
   // 根据id查找数据库中图片对于的地址
   const getAvator = (data) => {
@@ -146,8 +144,8 @@ const video_cover = (req, res) => {
   findByUid(id, getAvator);
 };
 
-// 根据uid下载博客
-const video_get_download = (req, res) => {
+// 根据uid下载博客中的视频
+const blog_video_download = (req, res) => {
   const { id: videoId } = req.params;
   // console.log(req)
   var file = path.resolve(__dirname, `../resources/video/${videoId}.mp4`);
@@ -171,8 +169,9 @@ const video_get_download = (req, res) => {
     }
   });
 };
+
 // 根据id审核博客
-const video_auditing_id = (req, res) => {
+const blog_auditing_id = (req, res) => {
   const { uid: videoId, auditing } = req.body;
   console.log(videoId, auditing);
   auditingByUid(videoId, JSON.parse(auditing));
@@ -180,7 +179,7 @@ const video_auditing_id = (req, res) => {
 };
 
 // 根据id删除博客
-const video_delete_id = (req, res) => {
+const blog_delete_id = (req, res) => {
   const { id: videoId } = req.params;
   console.log(req.params);
   deleteByUid(videoId);
@@ -188,7 +187,7 @@ const video_delete_id = (req, res) => {
 };
 
 // 上传博客接口
-const video_upload = (req, res) => {
+const blog_video_upload = (req, res) => {
   res.send("upload success!");
   let { uid } = req.body;
   uid = uid.getUid();
@@ -203,8 +202,7 @@ const video_upload = (req, res) => {
 };
 
 // 上传图片
-const video_upload_img = (req, res) => {
-  console.log(req.files);
+const blog_video_upload_img = (req, res) => {
   res.send("upload success!");
   let { uid } = req.body;
   uid = uid.getUid(); //获取纯数字的uid
@@ -215,11 +213,12 @@ const video_upload_img = (req, res) => {
 };
 
 // 上传博客表单信息
-const video_upload_data = (req, res) => {
+const blog_video_upload_data = (req, res) => {
   let data = req.body;
 
   // console.log("表单数据为" + data);
   // 上传条件判断 不可重复上传 不可重复录入数据库
+  console.log(oldpath_img, newpath_img, oldpath_video, newpath_video);
   if (oldpath_img && newpath_img && oldpath_video && newpath_video) {
     res.send({
       status: true,
@@ -243,7 +242,7 @@ const video_upload_data = (req, res) => {
 };
 
 // 修改博客信息
-const video_edit_data = (req, res) => {
+const blog_edit_data = (req, res) => {
   let data = req.body;
   console.log(data);
   // 上传条件判断 不可重复上传 不可重复录入数据库
@@ -268,8 +267,9 @@ const video_edit_data = (req, res) => {
     });
   }
 };
+
 // 搜索博客信息
-const video_search = (req, res) => {
+const blog_search = (req, res) => {
   const sendRes = (data) => {
     res.send(data);
   };
@@ -278,18 +278,18 @@ const video_search = (req, res) => {
 };
 
 module.exports = {
-  video_all,
-  video_all_paging,
-  video_play,
-  video_get_download,
-  video_upload,
-  video_upload_img,
-  video_upload_data,
-  video_get_id,
-  video_cover,
-  video_search,
-  video_auditing_id,
-  video_all_auditing,
-  video_delete_id,
-  video_edit_data,
+  blog_all,
+  blog_all_paging,
+  blog_video_play,
+  blog_video_download,
+  blog_video_upload,
+  blog_video_upload_img,
+  blog_video_upload_data,
+  blog_get_id,
+  blog_cover,
+  blog_search,
+  blog_auditing_id,
+  blog_all_auditing,
+  blog_delete_id,
+  blog_edit_data,
 };

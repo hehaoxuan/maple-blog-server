@@ -1,7 +1,7 @@
 const express = require("express");
-const videoRoute = require("./routes/video");
 const userRoute = require("./routes/user");
-const { connectDB } = require("./database/video.js");
+const blogRoute = require("./routes/blog");
+const { connectDB } = require("./database/blog.js");
 const bodyParser = require("body-parser");
 const app = express();
 
@@ -25,8 +25,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-app.use("/video", videoRoute);
 app.use("/user", userRoute);
+app.use("/blog", blogRoute);
 
 connectDB();
 const server = app.listen(8081, function () {

@@ -1,7 +1,7 @@
 const MongoClient = require("mongodb").MongoClient;
 const url = "mongodb://localhost:27017";
 const rdb = "test";
-const rcollection = "video";
+const rcollection = "blog";
 
 const connectDB = () => {
   MongoClient.connect(url, function (err, db) {
@@ -95,7 +95,7 @@ const findAllIsAuditing = (isAuditing, sendRes) => {
   });
 };
 
-// 根据id审核视频
+// 根据id审核blog
 const auditingByUid = (uid, auditing) => {
   MongoClient.connect(url, function (err, db) {
     if (err) throw err;
@@ -189,7 +189,6 @@ const search = (keywords, sendRes) => {
         },
       ],
     }; // 查询条件
-    console.log(whereStr);
     dbo
       .collection(rcollection)
       .find(whereStr)
