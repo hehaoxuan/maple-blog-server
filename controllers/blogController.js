@@ -56,6 +56,7 @@ const blog_all_paging = async (req, res) => {
 const blog_all_auditing = async (req, res) => {
   //返回所有的video信息
   let { auditing } = req.body;
+  auditing = auditing ? true : false;
 
   const sendRes = (data) => {
     res.send(data);
