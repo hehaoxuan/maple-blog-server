@@ -95,13 +95,13 @@ const findAllIsAuditing = (isAuditing, sendRes) => {
   });
 };
 
-// 根据id审核blog
+// 根据Blog id审核blog
 const auditingByUid = (uid, auditing) => {
   MongoClient.connect(url, function (err, db) {
     if (err) throw err;
     var dbo = db.db(rdb);
     var whereStr = {
-      videoUid: uid,
+      blogId: uid,
     }; // 查询条件
     var updateStr = {
       $set: {
@@ -114,6 +114,7 @@ const auditingByUid = (uid, auditing) => {
       .updateOne(whereStr, updateStr, function (err, res) {
         if (err) throw err;
         console.log("文档更新成功");
+        console.log(res);
         db.close();
       });
   });
@@ -124,7 +125,7 @@ const findByUid = (uid, sendRes) => {
     if (err) throw err;
     var dbo = db.db(rdb);
     var whereStr = {
-      videoUid: uid,
+      blogId: uid,
     }; // 查询条件
     dbo
       .collection(rcollection)
@@ -154,15 +155,13 @@ const updateOne = (uid, str) => {
     if (err) throw err;
     var dbo = db.db(rdb);
     var whereStr = {
-      videoUid: uid + "",
+      blogId: uid + "",
     }; // 查询条件
     var updateStr = {
       $set: {
         ...str,
       },
     };
-
-    console.log(updateStr);
     var options = { upsert: true };
 
     dbo
@@ -206,7 +205,7 @@ const deleteByUid = (uid) => {
     if (err) throw err;
     var dbo = db.db(rdb);
     var whereStr = {
-      videoUid: uid,
+      blogId: uid,
     }; // 查询条件
     dbo.collection(rcollection).deleteOne(whereStr, function (err, obj) {
       if (err) throw err;

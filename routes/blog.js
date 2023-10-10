@@ -5,7 +5,7 @@ const {
   blog_video_download,
   blog_video_upload,
   blog_video_upload_img,
-  blog_video_upload_data,
+  blog_create_data,
   blog_get_id,
   blog_cover,
   blog_search,
@@ -34,14 +34,12 @@ router.get("/:id/download", blog_video_download); //根据id下载
 router.get("/:id/cover", blog_cover); //封面头像
 router.post("/detail/:id", blog_get_id); //博客详细信息
 router.get("/search/:key", blog_search); //搜索信息
-router.post("/uploadData", urlencodedParser, blog_video_upload_data); //上传表单
+router.post("/add", urlencodedParser, blog_create_data); //上传表单
 router.post("/editData", urlencodedParser, blog_edit_data); //上传表单
 // 使用mutipart中间件 设置存储目录
 router.use(mutipart({ uploadDir: "./resources" }));
 router.post("/uploadVideo", mutipartMiddeware, blog_video_upload); //上传博客
 router.post("/uploadImg", mutipartMiddeware, blog_video_upload_img); //上传图片
-
-// router.get('/:id/point', blog_get_point)
 
 /* todo */
 // router.get('/:id/recommon', blog_get_recommon)

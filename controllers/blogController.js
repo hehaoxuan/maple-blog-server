@@ -1,5 +1,7 @@
 const fs = require("fs");
 const path = require("path");
+const { v4: uuidv4 } = require("uuid");
+const _ = require("lodash");
 
 var oldpath_img = null;
 var newpath_img = null;
@@ -123,7 +125,7 @@ const blog_cover = (req, res) => {
   // 根据id查找数据库中图片对于的地址
   const getAvator = (data) => {
     // console.log(data);
-    const file = data[0].imgUrl;
+    const file = data[0]?.imgUrl || "";
     // // 判断文件是否存在 若不存在则不进行博客流的播放
     // console.log(file);
     fs.access(file, function (err) {
@@ -173,17 +175,16 @@ const blog_video_download = (req, res) => {
 
 // 根据id审核博客
 const blog_auditing_id = (req, res) => {
-  const { uid: videoId, auditing } = req.body;
-  console.log(videoId, auditing);
-  auditingByUid(videoId, JSON.parse(auditing));
+  const { id, auditing } = req.body;
+  auditingByUid(id, !!auditing);
   res.send("success");
 };
 
 // 根据id删除博客
 const blog_delete_id = (req, res) => {
-  const { id: videoId } = req.params;
-  console.log(req.params);
-  deleteByUid(videoId);
+  const { id } = req.params;
+  console.log(id);
+  deleteByUid(id);
   res.send("success");
 };
 
@@ -214,27 +215,22 @@ const blog_video_upload_img = (req, res) => {
 };
 
 // 上传博客表单信息
-const blog_video_upload_data = (req, res) => {
+const blog_create_data = (req, res) => {
   let data = req.body;
-
-  // console.log("表单数据为" + data);
   // 上传条件判断 不可重复上传 不可重复录入数据库
-  console.log(oldpath_img, newpath_img, oldpath_video, newpath_video);
-  if (oldpath_img && newpath_img && oldpath_video && newpath_video) {
+  if (data) {
+    // 创建blog uid
+    const newData = {
+      blogId: uuidv4(), //生成一个不重复的blog uid
+      auditing: data?.auditing || false, //默认为下架状态
+    };
+    // 使用lodash合并数据
+    const mergedData = _.merge({}, data, newData);
+    console.log(mergedData);
+    insert(mergedData);
     res.send({
       status: true,
     });
-    rename(oldpath_video, newpath_video);
-    rename(oldpath_img, newpath_img);
-    //将零时的资源文件重命名 并移动到对应的文件夹下
-    // 保存url 与 uid
-    data.imgUrl = newpath_img;
-    data.videoUrl = newpath_video;
-    data.imgUid = data.avata[0].uid.getUid();
-    data.videoUid = data.video.uid.getUid();
-    insert(data);
-    // 处理数据
-    ldpath_img = newpath_img = oldpath_video = newpath_video = null;
   } else {
     res.send({
       status: false,
@@ -245,7 +241,6 @@ const blog_video_upload_data = (req, res) => {
 // 修改博客信息
 const blog_edit_data = (req, res) => {
   let data = req.body;
-  console.log(data);
   // 上传条件判断 不可重复上传 不可重复录入数据库
   if (oldpath_img && newpath_img) {
     res.send({
@@ -285,7 +280,7 @@ module.exports = {
   blog_video_download,
   blog_video_upload,
   blog_video_upload_img,
-  blog_video_upload_data,
+  blog_create_data,
   blog_get_id,
   blog_cover,
   blog_search,
